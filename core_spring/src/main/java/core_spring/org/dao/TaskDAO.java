@@ -31,5 +31,23 @@ public class TaskDAO {
 		return id;
 
 	}
+	
+	public TaskEntity updateTask(TaskEntity task) {
+		Session session = sessionFactory.openSession();
+		Long id;
+		// bắt đầu 1 giao dịch
+		session.beginTransaction();
+
+		// thực thi câu query dạng hql
+		id = (Long) session.save(task);
+
+		// kết thúc 1 giao dịch
+		session.getTransaction().commit();
+
+		session.close();
+
+		return id;
+
+	}
 
 }

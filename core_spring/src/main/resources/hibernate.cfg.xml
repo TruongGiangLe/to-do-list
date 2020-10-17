@@ -24,7 +24,7 @@
         <!-- Show all executed SQL to console -->
         <property name="show_sql">true</property>
         
- 
+        <property name="hibernate.hbm2ddl.auto">update</property>
         <!-- Entity mapping -->
         <mapping class="core_spring.org.entities.UserEntity" />
         <mapping class="core_spring.org.entities.TaskEntity" />

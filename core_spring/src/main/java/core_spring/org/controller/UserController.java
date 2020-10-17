@@ -15,6 +15,7 @@ import core_spring.org.services.JwtService;
 import core_spring.org.services.UserService;
 
 @RestController
+@RequestMapping("/auth")
 public class UserController {
 
 	@Autowired

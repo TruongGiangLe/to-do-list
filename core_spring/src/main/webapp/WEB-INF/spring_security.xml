@@ -8,8 +8,20 @@
 
     <beans:bean id="customAccessDeniedHandler"
 		class="core_spring.org.authentication.CustomAccessDeniedHandler" />
+		
+	 <beans:bean id="myFilter"
+	class="core_spring.org.authentication.JwtAuthenticationTokenFilter" />
+	
+	 <beans:bean id="entryPoint"
+		class="core_spring.org.authentication.RestAuthenticationEntryPoint" />
+		
+	<beans:bean id="authManager"
+		class="core_spring.org.authentication.UsernamePasswordAuthManager" />
 
-	<http pattern="/core_spring/login" security="none"/>
+	<http entry-point-ref="entryPoint" pattern="/task/**" authentication-manager-ref="authManager">
+		<custom-filter position="LAST" ref="myFilter" />
+		<csrf disabled="true" />
+	</http>
 
 
 

@@ -24,7 +24,6 @@ import core_spring.org.entities.UserEntity;
 import core_spring.org.services.JwtService;
 import core_spring.org.services.UserService;
 
-@Component
 public class JwtAuthenticationTokenFilter extends BasicAuthenticationFilter {
 
 	private final static String TOKEN_HEADER = "authorization";
@@ -48,8 +47,7 @@ public class JwtAuthenticationTokenFilter extends BasicAuthenticationFilter {
 		String authToken = request.getHeader(TOKEN_HEADER);
 		
 		if (authToken == null || authToken.equals("")) {
-			chain.doFilter(request, response);
-			return;
+			throw new RuntimeException();
 		}
 		
 		if (!jwtService.validateTokenLogin(authToken)) {
