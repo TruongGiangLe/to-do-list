@@ -18,7 +18,7 @@
 	<beans:bean id="authManager"
 		class="core_spring.org.authentication.UsernamePasswordAuthManager" />
 
-	<http entry-point-ref="entryPoint" pattern="/task/**" authentication-manager-ref="authManager">
+	<http entry-point-ref="entryPoint" pattern="/task/**" authentication-manager-ref="authManager" >
 		<custom-filter position="LAST" ref="myFilter" />
 		<csrf disabled="true" />
 	</http>

@@ -26,13 +26,18 @@ import core_spring.org.services.UserService;
 
 public class JwtAuthenticationTokenFilter extends BasicAuthenticationFilter {
 
-	private final static String TOKEN_HEADER = "authorization";
+	private final static String TOKEN_HEADER = "Authorization";
 
 	@Autowired
 	private JwtService jwtService;
 
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private CustomAccessDeniedHandler deniedHandler;
+	
+	
 	
 	public JwtAuthenticationTokenFilter(UsernamePasswordAuthManager authenticationManager) {
 		super(authenticationManager);
@@ -46,18 +51,16 @@ public class JwtAuthenticationTokenFilter extends BasicAuthenticationFilter {
 		
 		String authToken = request.getHeader(TOKEN_HEADER);
 		
-		if (authToken == null || authToken.equals("")) {
-			throw new RuntimeException();
-		}
-		
-		if (!jwtService.validateTokenLogin(authToken)) {
-			throw new RuntimeException();
+		if (authToken == null || authToken.equals("") || !jwtService.validateTokenLogin(authToken)) {
+			deniedHandler.handle(request, response, null);
+			return;
 		}
 		
 		String username = jwtService.getUsernameFromToken(authToken);
 		UserEntity user = userService.findUserByUserName(username);
 		if (user == null) {
-			throw new RuntimeException();
+			deniedHandler.handle(request, response, null);
+			return;
 		}
 		
 		UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, authToken);

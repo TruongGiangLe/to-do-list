@@ -16,5 +16,12 @@ public class TaskService {
 	 public Long addTask(TaskEntity task) {
 		 return taskDAO.addTask(task);
 	 }
+	 
+	 public void updateTask(TaskEntity task) {
+		 taskDAO.updateTask(task);
+	 }
 	
+	 public void deleteTask(Long id) {
+		 taskDAO.deleteTask(id);
+	 }
 }

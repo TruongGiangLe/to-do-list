@@ -2,6 +2,7 @@ package core_spring.org.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -40,18 +41,28 @@ public class UserController {
 		if (!userService.isUserNameExist(newUser.getUserName())) {
 			userService.save(newUser);
 			return "created successfully!";
-		} else
-			return "your user name has been used!";
+		} 
+		
+		return "your user name has been used!";
 
 	}
 
 	/* ---------------- UPDATE USER ------------------------ */
 	@RequestMapping(value = "/update_user", method = RequestMethod.PUT, headers = "Accept=application/json")
-	public @ResponseBody String updateUser(@RequestBody UserEntity user) {
-		if (!userService.isUserNameExist(user.getUserName())) {
-			userService.updateUser(user);
-			return "updated successfully";
-		} else return "your user name has been used!";
+	public @ResponseBody String updateUser(@RequestBody UserEntity user, @RequestHeader("Authorization") String token) {
+		UserEntity oldUser = null;
+		if (!jwtService.validateTokenLogin(token)) return "unauthorization!";
+		
+		String userName = jwtService.getUsernameFromToken(token);
+		oldUser = userService.findUserByUserName(userName);
+		
+		if(oldUser == null) return "unauthorization!";
+		
+		user.setId(oldUser.getId());
+		userService.updateUser(user);
+		
+		return "updated successfully";
+		
 	}
 
 	/* ---------------- LOGIN USER ------------------------ */
@@ -70,7 +81,6 @@ public class UserController {
 		}
 		
 		token = jwtService.generateTokenLogin(userName);
-		//SessionUtils.getInstance().putValue(request, key, value);
 		return token;
 	}
 
