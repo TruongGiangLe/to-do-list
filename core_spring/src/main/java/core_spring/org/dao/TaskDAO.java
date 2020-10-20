@@ -1,16 +1,12 @@
 package core_spring.org.dao;
 
-import java.util.List;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import core_spring.org.entities.TaskEntity;
-import core_spring.org.entities.UserEntity;
 
 @Repository(value = "taskDAO")
 @Transactional(rollbackFor = Exception.class)
@@ -84,27 +80,5 @@ public class TaskDAO {
 		session.close();
 	}
 	
-//	@SuppressWarnings("unchecked")
-//	public List<TaskEntity> getAllTask(Long id) {
-//		
-//		String hql = "FROM TaskEntity WHERE  = :userName";
-//		
-//		Session session = sessionFactory.openSession();		
-//
-//		// bắt đầu 1 giao dịch
-//		session.beginTransaction();		
-//		Query<UserEntity> query = session.createQuery(hql);
-//		query.setParameter("userName", userName);
-//		List<UserEntity> results = query.list();
-//		
-//		// kết thúc 1 giao dịch
-//		session.getTransaction().commit();
-//
-//		session.close();
-//
-//		
-//		if(results.size() == 0 ) return null; else return results.get(0);
-//		
-//	}
 
 }

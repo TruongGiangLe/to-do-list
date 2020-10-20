@@ -1,6 +1,8 @@
 package core_spring.org.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,14 +46,15 @@ public class TaskController {
 	/* ---------------- UPDATE TASK ------------------------ */
 	@RequestMapping(value = "/update_task", method = RequestMethod.PUT, headers = "Accept=application/json")
 	public @ResponseBody String updateTask(@RequestBody TaskEntity task) {
+		
 		taskService.updateTask(task);
 		return "updated successfully!";
 	}
 	
 	/* ---------------- DELETE TASK ------------------------ */
-	@RequestMapping(value = "/delete_task", method = RequestMethod.DELETE, headers = "Accept=application/json")
-	public @ResponseBody String deleteTask(@RequestBody TaskEntity task) {
-		taskService.deleteTask(task.getId());
+	@DeleteMapping("/delete_task/{taskId}")
+	public @ResponseBody String deleteTask(@PathVariable Long taskId) {
+		taskService.deleteTask(taskId);
 		return "deleted successfully!";
 	}
 	

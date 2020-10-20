@@ -1,5 +1,8 @@
 package core_spring.org.controller;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -11,6 +14,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import core_spring.org.entities.TaskEntity;
 import core_spring.org.entities.UserEntity;
 import core_spring.org.services.JwtService;
 import core_spring.org.services.UserService;
@@ -34,18 +38,6 @@ public class UserController {
 		return new ModelAndView("welcome", "message", message);
 	}
 
-	/* ---------------- CREATE NEW USER ------------------------ */
-	@RequestMapping(value = "/create_user", method = RequestMethod.POST, headers = "Accept=application/json")
-	public @ResponseBody String createUser(@RequestBody UserEntity user) {
-		UserEntity newUser = new UserEntity(user.getUserName(), user.getPassword());
-		if (!userService.isUserNameExist(newUser.getUserName())) {
-			userService.save(newUser);
-			return "created successfully!";
-		} 
-		
-		return "your user name has been used!";
-
-	}
 
 	/* ---------------- UPDATE USER ------------------------ */
 	@RequestMapping(value = "/update_user", method = RequestMethod.PUT, headers = "Accept=application/json")
@@ -64,24 +56,46 @@ public class UserController {
 		return "updated successfully";
 		
 	}
-
-	/* ---------------- LOGIN USER ------------------------ */
-	@RequestMapping(value = "/login", headers = "Accept=application/json", method = RequestMethod.POST)
-	public @ResponseBody String userLogin(@RequestBody UserEntity user) {
-		String token = "";
-		String userName = user.getUserName();
-		String password = user.getPassword();
-		UserEntity checkUser = userService.findUserByUserName(userName);
-		if(checkUser == null) {
-			return "account is not existed!";
-		}
-		
-		if(!checkUser.getPassword().equals(password)) {
-			return "your password isn't correct!";
-		}
-		
-		token = jwtService.generateTokenLogin(userName);
-		return token;
+	
+	/* ---------------- GET ALL TASKS ------------------------ */
+	@RequestMapping(value = "/get_all_task", headers = "Accept=application/json", method = RequestMethod.GET)
+	public @ResponseBody List<TaskEntity> getAllTask(@RequestBody UserEntity user) {
+		UserEntity realUser = userService.findById(user.getId());
+		return userService.getAllTask(realUser);
 	}
+	
+	/* ---------------- GET TASKS BY STATUS ------------------------ */
+	@RequestMapping(value = "/get_tasks_by_status/to_do", headers = "Accept=application/json", method = RequestMethod.GET)
+	public @ResponseBody List<TaskEntity> getToDoTask(@RequestBody UserEntity user) {
+		UserEntity realUser = userService.findById(user.getId());
+		List<TaskEntity> allTask = userService.getAllTask(realUser);
+		List<TaskEntity> toDoTask = new LinkedList<TaskEntity>();
+		for(int i = 0; i < allTask.size(); i++) {
+			TaskEntity task = allTask.get(i);
+			if(task.getStatus().equals("to do")) toDoTask.add(task);
+		}
+		return toDoTask;
+	}
+	
+	/* ---------------- GET TASKS BY STATUS ------------------------ */
+	@RequestMapping(value = "/get_tasks_by_status/finished", headers = "Accept=application/json", method = RequestMethod.GET)
+	public @ResponseBody List<TaskEntity> getFinishedTask(@RequestBody UserEntity user) {
+		UserEntity realUser = userService.findById(user.getId());
+		List<TaskEntity> allTask = userService.getAllTask(realUser);
+		List<TaskEntity> finishedTask = new LinkedList<TaskEntity>();
+		for(int i = 0; i < allTask.size(); i++) {
+			TaskEntity task = allTask.get(i);
+			if(task.getStatus().equals("finished")) finishedTask.add(task);
+		}
+		return finishedTask;
+	}
+	
+	/* ---------------- GET ALL USERS ------------------------ */
+	@RequestMapping(value = "/get_all_user", method = RequestMethod.GET, headers = "Accept=application/json")
+	public @ResponseBody List<UserEntity> getAllUser() {
+		return userService.getAllUser();
+	}
+	
+	
 
 }

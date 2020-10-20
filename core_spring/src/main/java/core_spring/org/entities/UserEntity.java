@@ -12,8 +12,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
-
-import core_spring.org.entities.TaskEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 @Entity
@@ -31,6 +30,7 @@ public class UserEntity {
     
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     @OrderBy("id")
+    @JsonIgnore
     private Set<TaskEntity> task;
 
 	public UserEntity(String userName, String password) {

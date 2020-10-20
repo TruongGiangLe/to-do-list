@@ -23,6 +23,10 @@
 		<csrf disabled="true" />
 	</http>
 
+	<http entry-point-ref="entryPoint" pattern="/auth/**" authentication-manager-ref="authManager" >
+		<custom-filter position="LAST" ref="myFilter" />
+		<csrf disabled="true" />
+	</http>
 
 
 
