@@ -1,18 +1,15 @@
 package core_spring.org.controller;
 
-import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import core_spring.org.entities.TaskEntity;
 import core_spring.org.entities.UserEntity;
@@ -22,14 +19,17 @@ import core_spring.org.services.UserService;
 @RestController
 @RequestMapping("/auth")
 public class UserController {
-
-	@Autowired
+	
 	private UserService userService;
 	
-	@Autowired
-	private JwtService jwtService;
+	
+	public UserController(UserService userService, JwtService jwtService) {
+		super();
+		this.userService = userService;
+	}
 
-	ObjectMapper mapper = new ObjectMapper();
+
+	//ObjectMapper mapper = new ObjectMapper();
 
 	@RequestMapping("/welcome")
 	public ModelAndView helloWorld() {
@@ -40,62 +40,49 @@ public class UserController {
 
 
 	/* ---------------- UPDATE USER ------------------------ */
-	@RequestMapping(value = "/update_user", method = RequestMethod.PUT, headers = "Accept=application/json")
-	public @ResponseBody String updateUser(@RequestBody UserEntity user, @RequestHeader("Authorization") String token) {
-		UserEntity oldUser = null;
-		if (!jwtService.validateTokenLogin(token)) return "unauthorization!";
-		
-		String userName = jwtService.getUsernameFromToken(token);
-		oldUser = userService.findUserByUserName(userName);
-		
-		if(oldUser == null) return "unauthorization!";
-		
-		user.setId(oldUser.getId());
-		userService.updateUser(user);
-		
+	@PutMapping("/update_user")
+	public String updateUser(
+			Authentication authentication,
+			@RequestBody UserEntity newUser
+	) {
+		UserEntity oldUser = (UserEntity) authentication.getPrincipal();
+		newUser.setId(oldUser.getId());
+		userService.updateUser(newUser);
 		return "updated successfully";
 		
 	}
 	
 	/* ---------------- GET ALL TASKS ------------------------ */
-	@RequestMapping(value = "/get_all_task", headers = "Accept=application/json", method = RequestMethod.GET)
-	public @ResponseBody List<TaskEntity> getAllTask(@RequestBody UserEntity user) {
-		UserEntity realUser = userService.findById(user.getId());
-		return userService.getAllTask(realUser);
+	@GetMapping("/get_all_task")
+	public List<TaskEntity> getAllTask( 
+			Authentication authentication) {
+		UserEntity tempUser = (UserEntity) authentication.getPrincipal();
+		return userService.getAllTask(tempUser);
 	}
 	
 	/* ---------------- GET TASKS BY STATUS ------------------------ */
-	@RequestMapping(value = "/get_tasks_by_status/to_do", headers = "Accept=application/json", method = RequestMethod.GET)
-	public @ResponseBody List<TaskEntity> getToDoTask(@RequestBody UserEntity user) {
-		UserEntity realUser = userService.findById(user.getId());
-		List<TaskEntity> allTask = userService.getAllTask(realUser);
-		List<TaskEntity> toDoTask = new LinkedList<TaskEntity>();
-		for(int i = 0; i < allTask.size(); i++) {
-			TaskEntity task = allTask.get(i);
-			if(task.getStatus().equals("to do")) toDoTask.add(task);
-		}
-		return toDoTask;
+	@GetMapping("/get_tasks_by_status/to_do")
+	public List<TaskEntity> getToDoTask(Authentication authentication) {
+		UserEntity user = (UserEntity) authentication.getPrincipal();
+		return userService.getAllTask(user).stream()
+				.filter(t -> t.getStatus().equals("to do"))
+				.collect(Collectors.toList());
 	}
 	
 	/* ---------------- GET TASKS BY STATUS ------------------------ */
-	@RequestMapping(value = "/get_tasks_by_status/finished", headers = "Accept=application/json", method = RequestMethod.GET)
-	public @ResponseBody List<TaskEntity> getFinishedTask(@RequestBody UserEntity user) {
-		UserEntity realUser = userService.findById(user.getId());
-		List<TaskEntity> allTask = userService.getAllTask(realUser);
-		List<TaskEntity> finishedTask = new LinkedList<TaskEntity>();
-		for(int i = 0; i < allTask.size(); i++) {
-			TaskEntity task = allTask.get(i);
-			if(task.getStatus().equals("finished")) finishedTask.add(task);
-		}
-		return finishedTask;
+	@GetMapping("/get_tasks_by_status/finished")
+	public List<TaskEntity> getFinishedTask(Authentication authentication) {
+		UserEntity user = (UserEntity) authentication.getPrincipal();
+		return userService.getAllTask(user).stream()
+		.filter(t -> t.getStatus().equals("finished"))
+		.collect(Collectors.toList());
 	}
 	
 	/* ---------------- GET ALL USERS ------------------------ */
-	@RequestMapping(value = "/get_all_user", method = RequestMethod.GET, headers = "Accept=application/json")
-	public @ResponseBody List<UserEntity> getAllUser() {
+	@GetMapping("/get_all_user")
+	public List<UserEntity> getAllUser() {
 		return userService.getAllUser();
 	}
-	
 	
 
 }

@@ -1,29 +1,29 @@
 package core_spring.org.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import core_spring.org.entities.UserEntity;
 import core_spring.org.services.JwtService;
 import core_spring.org.services.UserService;
 
 
-@Controller
+@RestController
 public class BaseController {
 	
-	@Autowired
 	private UserService userService;
-	
-	@Autowired
 	private JwtService jwtService;
 
+	public BaseController(UserService userService, JwtService jwtService) {
+		super();
+		this.userService = userService;
+		this.jwtService = jwtService;
+	}
+
 	/* ---------------- LOGIN USER ------------------------ */
-	@RequestMapping(value = "/login", headers = "Accept=application/json", method = RequestMethod.POST)
-	public @ResponseBody String userLogin(@RequestBody UserEntity user) {
+	@PostMapping("/login")
+	public String userLogin(@RequestBody UserEntity user) {
 		String token = "";
 		String userName = user.getUserName();
 		String password = user.getPassword();
@@ -41,8 +41,8 @@ public class BaseController {
 	}
 	
 	/* ---------------- CREATE NEW USER ------------------------ */
-	@RequestMapping(value = "/create_user", method = RequestMethod.POST, headers = "Accept=application/json")
-	public @ResponseBody String createUser(@RequestBody UserEntity user) {
+	@PostMapping("/create_user")
+	public String createUser(@RequestBody UserEntity user) {
 		UserEntity newUser = new UserEntity(user.getUserName(), user.getPassword());
 		if (!userService.isUserNameExist(newUser.getUserName())) {
 			userService.save(newUser);

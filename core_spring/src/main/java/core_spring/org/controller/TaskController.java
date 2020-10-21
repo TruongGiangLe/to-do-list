@@ -1,40 +1,33 @@
 package core_spring.org.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import core_spring.org.entities.TaskEntity;
 import core_spring.org.entities.UserEntity;
-import core_spring.org.services.JwtService;
 import core_spring.org.services.TaskService;
-import core_spring.org.services.UserService;
 
 @RestController
 @RequestMapping("/task")
 public class TaskController {
-
-	@Autowired
 	private TaskService taskService;
-	
-	@Autowired
-	private JwtService jwtService;
-	
-	@Autowired
-	private UserService userService;
+
+	public TaskController(TaskService taskService) {
+		this.taskService = taskService;
+	}
 
 	/* ---------------- CREATE NEW TASK ------------------------ */
-	@RequestMapping(value = "/add_new_task", method = RequestMethod.POST, headers = "Accept=application/json")
-	public @ResponseBody String addNewTask(@RequestBody TaskEntity task, @RequestHeader("Authorization") String token) {
-		String userName = jwtService.getUsernameFromToken(token);
-		UserEntity user = userService.findUserByUserName(userName);
-		
+	@PostMapping("/add_new_task")
+	public String addNewTask(
+			@RequestBody TaskEntity task, 
+			Authentication authentication) {
+		UserEntity user = (UserEntity) authentication.getPrincipal();
 		TaskEntity newTask = new TaskEntity();
 		newTask.setStatus("to do");
 		newTask.setTaskContent(task.getTaskContent());
@@ -42,23 +35,19 @@ public class TaskController {
 		taskService.addTask(newTask);
 		return "added successfully!";
 	}
-	
+
 	/* ---------------- UPDATE TASK ------------------------ */
-	@RequestMapping(value = "/update_task", method = RequestMethod.PUT, headers = "Accept=application/json")
-	public @ResponseBody String updateTask(@RequestBody TaskEntity task) {
-		
+	@PutMapping("/update_task")
+	public String updateTask(@RequestBody TaskEntity task) {
 		taskService.updateTask(task);
 		return "updated successfully!";
 	}
-	
+
 	/* ---------------- DELETE TASK ------------------------ */
 	@DeleteMapping("/delete_task/{taskId}")
-	public @ResponseBody String deleteTask(@PathVariable Long taskId) {
+	public String deleteTask(@PathVariable Long taskId) {
 		taskService.deleteTask(taskId);
 		return "deleted successfully!";
 	}
-	
-	
-	
-	
+
 }

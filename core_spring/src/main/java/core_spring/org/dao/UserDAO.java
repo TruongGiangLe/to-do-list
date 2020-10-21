@@ -21,6 +21,10 @@ public class UserDAO {
 
 	SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
 
+	public UserDAO() {
+		super();
+	}
+
 	public Long save(UserEntity user) {
 		Session session = sessionFactory.openSession();
 		Long id = null;
