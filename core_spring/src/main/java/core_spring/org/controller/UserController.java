@@ -84,5 +84,10 @@ public class UserController {
 		return userService.getAllUser();
 	}
 	
+	/* ---------------- GET USERS PROFILE ------------------------ */
+	@GetMapping("/get_user_profile") 
+	public UserEntity getUserProfile(Authentication authentication) {
+		return (UserEntity) authentication.getPrincipal();
+	}
 
 }

@@ -24,7 +24,7 @@ public class TaskController {
 
 	/* ---------------- CREATE NEW TASK ------------------------ */
 	@PostMapping("/add_new_task")
-	public String addNewTask(
+	public TaskEntity addNewTask(
 			@RequestBody TaskEntity task, 
 			Authentication authentication) {
 		UserEntity user = (UserEntity) authentication.getPrincipal();
@@ -32,8 +32,7 @@ public class TaskController {
 		newTask.setStatus("to do");
 		newTask.setTaskContent(task.getTaskContent());
 		newTask.setUser(user);
-		taskService.addTask(newTask);
-		return "added successfully!";
+		return taskService.addTask(newTask);
 	}
 
 	/* ---------------- UPDATE TASK ------------------------ */

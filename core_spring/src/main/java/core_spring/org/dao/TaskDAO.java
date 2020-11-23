@@ -14,7 +14,7 @@ public class TaskDAO {
 
 	SessionFactory sessionFactory = new Configuration().configure().buildSessionFactory();
 
-	public Long addTask(TaskEntity task) {
+	public TaskEntity addTask(TaskEntity task) {
 		Session session = sessionFactory.openSession();
 		Long id;
 		// bắt đầu 1 giao dịch
@@ -28,7 +28,7 @@ public class TaskDAO {
 
 		session.close();
 
-		return id;
+		return getTaskById(id);
 
 	}
 	

@@ -16,7 +16,7 @@ public class TaskService {
 			 this.taskDAO = taskDAO;
 	}
 	 
-	 public Long addTask(TaskEntity task) {
+	 public TaskEntity addTask(TaskEntity task) {
 		 return taskDAO.addTask(task);
 	 }
 	 
